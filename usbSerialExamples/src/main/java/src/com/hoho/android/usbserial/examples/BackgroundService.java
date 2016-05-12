@@ -15,6 +15,11 @@ import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
+//BJ - added for code changes see BJ below
+import android.app.PendingIntent;
+import android.app.AlarmManager;
+import android.os.SystemClock;
+
 import com.hoho.android.usbserial.driver.CdcAcmSerialDriver;
 import com.hoho.android.usbserial.driver.ProbeTable;
 import com.hoho.android.usbserial.driver.UsbSerialDriver;
@@ -27,6 +32,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+//BJ
+//import java.lang.Object;
 
 public class BackgroundService extends Service {
 
@@ -133,7 +140,21 @@ public class BackgroundService extends Service {
         }
     }
 
+	// BJ restart service if it is killed
+	@Override
+	public void onTaskRemoved(Intent rootIntent){
+		Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+		restartServiceIntent.setPackage(getPackageName());
 
+		PendingIntent restartServicePendingIntent = PendingIntent.getService(getApplicationContext(), 1, restartServiceIntent, PendingIntent.FLAG_ONE_SHOT);
+		AlarmManager alarmService = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+		alarmService.set(
+		AlarmManager.ELAPSED_REALTIME,
+		SystemClock.elapsedRealtime() + 1000,
+		restartServicePendingIntent);
+
+		super.onTaskRemoved(rootIntent);
+	 }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

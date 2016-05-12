@@ -163,6 +163,25 @@ public class DeviceListActivity extends Activity {
                 showConsoleActivity(port);
             }
         });
+			
+			// BJ choose automatically after 2 seconds to allow for listview to be drawn
+			new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				int mActivePosition = 0;
+				mListView.performItemClick(
+				mListView.getChildAt(0),
+				0,
+				mListView.getAdapter().getItemId(0));
+                // show home screen (for car)
+                Intent startMain = new Intent(Intent.ACTION_MAIN);
+				startMain.addCategory(Intent.CATEGORY_HOME);
+				//startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+				startActivity(startMain);
+                
+			}
+		}, 2000);
+        
     }
 
     @Override
@@ -230,6 +249,8 @@ public class DeviceListActivity extends Activity {
         mUsbManager.requestPermission(port.getDriver().getDevice(), pendingIntent);
         Toast.makeText(this, "Started Background Service for GPS", Toast.LENGTH_LONG).show();
         //SerialConsoleActivity.show(this, port);
+        // BJ go to home screen since this is for the car
+        
     }
 
 }
